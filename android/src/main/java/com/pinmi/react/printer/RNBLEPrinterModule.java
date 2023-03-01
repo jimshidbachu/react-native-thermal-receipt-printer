@@ -1,6 +1,12 @@
 package com.pinmi.react.printer;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.util.Log;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Callback;
@@ -32,10 +38,17 @@ public class RNBLEPrinterModule extends ReactContextBaseJavaModule implements RN
     }
 
 
-
     @ReactMethod
     @Override
     public void init(Callback successCallback, Callback errorCallback) {
+        if (ContextCompat.checkSelfPermission(getCurrentActivity(), Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED)
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+            {
+                ActivityCompat.requestPermissions(getCurrentActivity(), new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+                return;
+            }
+        }
         this.adapter = BLEPrinterAdapter.getInstance();
         this.adapter.init(reactContext,  successCallback, errorCallback);
     }
@@ -67,15 +80,15 @@ public class RNBLEPrinterModule extends ReactContextBaseJavaModule implements RN
     public void printRawData(String base64Data, Callback errorCallback){
         adapter.printRawData(base64Data, errorCallback);
     }
-    @ReactMethod
+
     @Override
     public void printImageData(String imageUrl, Callback errorCallback) {
-        adapter.printImageData(imageUrl, errorCallback);
+
     }
-    @ReactMethod
+
     @Override
     public void printQrCode(String qrCode, Callback errorCallback) {
-        adapter.printQrCode(qrCode, errorCallback);
+
     }
 
 
